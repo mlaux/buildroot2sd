@@ -82,6 +82,10 @@ TEMP_MOUNT=$(mktemp -d mnt.XXXXX)
 mount -t ext2 "$ROOT_FILE" "$TEMP_MOUNT"
 (cd "$TEMP_MOUNT" && tar xf "../$ROOTFS_FILE")
 
+# make sure all changes are written to file underlying loopback device
+# before adding it to the main image
+sync
+
 # copy the HDD driver and 3 partitions into the main disk image
 echo "* Combining partition table and partitions into $IMAGE_FILE..."
 dd if="$DRIVER_FILE" of="$IMAGE_FILE" seek="$DRIVER_OFFSET" bs=512 conv=notrunc
@@ -91,7 +95,7 @@ dd if="$ROOT_FILE" of="$IMAGE_FILE" seek="$ROOT_OFFSET" bs=512 conv=notrunc
 
 echo "* Cleaning up..."
 rm $SWAP_FILE
-umount -l "$ROOT_FILE"
+umount "$ROOT_FILE"
 rmdir "$TEMP_MOUNT"
 rm "$ROOT_FILE"
 
