@@ -18,12 +18,13 @@ SWAP_SIZE=$2
 ROOTFS_FILE=$3
 
 # create image and attach to next available loop device
-IMAGE_FILE=$(mktemp image.XXXXX)
+IMAGE_FILE=$(mktemp XXXXX.img)
 dd if=/dev/zero of="$IMAGE_FILE" bs=1M count="$IMAGE_SIZE"
 LOOP_DEVICE=$(losetup --partscan --show --find "$IMAGE_FILE")
 
 # partition with swap and root partitions
-echo "- ${SWAP_SIZE}M 82 -\n- + 83 -" | sfdisk "$LOOP_DEVICE"
+echo "- ${SWAP_SIZE}M 82 -
+- + 83 -" | sfdisk "$LOOP_DEVICE"
 
 # format the partitions
 mkswap "${LOOP_DEVICE}p1"
